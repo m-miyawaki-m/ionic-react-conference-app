@@ -1,5 +1,3 @@
-import React, { useEffect } from 'react';
-import { Route } from 'react-router-dom';
 import {
   IonApp,
   IonRouterOutlet,
@@ -7,6 +5,8 @@ import {
   setupIonicReact,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import React, { useEffect } from 'react';
+import { Route } from 'react-router-dom';
 
 import Menu from './components/Menu';
 
@@ -19,12 +19,12 @@ import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
 
 /* Optional CSS utils that can be commented out */
-import '@ionic/react/css/padding.css';
+import '@ionic/react/css/display.css';
+import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/float-elements.css';
+import '@ionic/react/css/padding.css';
 import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
 
 /**
  * Ionic Dark Mode
@@ -42,23 +42,24 @@ import './theme/variables.css';
 
 /* Global styles */
 import './App.scss';
-import MainTabs from './pages/MainTabs';
-import { connect } from './data/connect';
+import HomeOrTutorial from './components/HomeOrTutorial';
+import RedirectToLogin from './components/RedirectToLogin';
 import { AppContextProvider } from './data/AppContext';
+import { connect } from './data/connect';
 import { loadConfData } from './data/sessions/sessions.actions';
 import {
+  loadUserData,
   setIsLoggedIn,
   setUsername,
-  loadUserData,
 } from './data/user/user.actions';
+import { Schedule } from './models/Schedule';
 import Account from './pages/Account';
 import Login from './pages/Login';
+import MainTabs from './pages/MainTabs';
+import MyPage from './pages/MyPage'; // 新しいページをインポート
 import Signup from './pages/Signup';
 import Support from './pages/Support';
 import Tutorial from './pages/Tutorial';
-import HomeOrTutorial from './components/HomeOrTutorial';
-import { Schedule } from './models/Schedule';
-import RedirectToLogin from './components/RedirectToLogin';
 
 setupIonicReact();
 
@@ -116,6 +117,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/signup" component={Signup} />
             <Route path="/support" component={Support} />
             <Route path="/tutorial" component={Tutorial} />
+            <Route path="/my-page" component={MyPage} />
             <Route
               path="/logout"
               render={() => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteComponentProps, withRouter, useLocation } from 'react-router';
+import { RouteComponentProps, useLocation, withRouter } from 'react-router';
 
 import {
   IonContent,
@@ -15,12 +15,12 @@ import {
 import {
   calendarOutline,
   hammer,
-  moonOutline,
   help,
   informationCircleOutline,
   logIn,
   logOut,
   mapOutline,
+  moonOutline,
   peopleOutline,
   person,
   personAdd,
@@ -37,6 +37,7 @@ const routes = {
     { title: 'Speakers', path: '/tabs/speakers', icon: peopleOutline },
     { title: 'Map', path: '/tabs/map', icon: mapOutline },
     { title: 'About', path: '/tabs/about', icon: informationCircleOutline },
+    { title: 'My Page', path: '/my-page', icon: informationCircleOutline },
   ],
   loggedInPages: [
     { title: 'Account', path: '/account', icon: person },
