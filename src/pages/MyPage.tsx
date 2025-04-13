@@ -16,6 +16,8 @@ import 'react-calendar/dist/Calendar.css';
 import MyItemList from '../components/MyItemList'; // ← 追加
 import UserTable from '../components/UserTable';
 import { useAjaxLoader } from '../hooks/useAjaxLoader'; // カスタムフックをインポート
+import { getAllRequestsFromIndexedDB, removeRequestsByIndexes, saveRequestToIndexedDB } from '../utils/indexedDB'; // ← 追加
+
 interface UserData {
   name: string;
   email: string;
@@ -60,7 +62,67 @@ const MyPage: React.FC = () => {
     });
   }, []);
 
+  const handleResendRequests = async () => {
+    await safePresent('再送信中...');
+    try {
+      const requests = await getAllRequestsFromIndexedDB();
+  
+      const successIndexes: number[] = [];
+      const reqWithIndex = requests.map((req, idx) => ({ req, idx }));
+  
+      for (const { req, idx } of reqWithIndex) {
+        if (req.type === 'userPost') {
+          try {
+            await $.ajax({
+              url: 'https://api.example.com/users',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(req.data),
+            });
+            successIndexes.push(idx);
+            console.log('[Resend] 成功:', req);
+          } catch (err) {
+            console.warn('[Resend] 失敗（保存継続）:', req);
+          }
+        }
+      }
+  
+      // 成功した分だけIndexedDBから削除
+      await removeRequestsByIndexes(successIndexes);
+  
+      alert(`再送信完了（成功：${successIndexes.length}件）`);
+    } catch (err) {
+      console.error('[Resend] 全体エラー:', err);
+      alert('リクエスト再送信に失敗しました');
+    } finally {
+      await safeDismiss();
+    }
+  };
+  
 
+
+  const handleSubmitUsers = async () => {
+    await safePresent('Sending user data...');
+  
+    $.ajax({
+      url: 'https://api.example.com/users',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(users),
+      timeout: 10000,
+      success: () => {
+        console.log('Data sent successfully');
+        safeDismiss();
+      },
+      error: async () => {
+        console.warn('POST failed, saving to IndexedDB...');
+        await saveRequestToIndexedDB({ type: 'userPost', data: users });
+        safeDismiss();
+      }
+    });
+  };
+  
+  
   // ユーザーデータ取得
   useEffect(() => {
     const loadUserData = async () => {
@@ -187,6 +249,12 @@ const MyPage: React.FC = () => {
         <div style={{ padding: '16px' }}>
           <UserTable users={users} />
         </div>
+        <IonButton expand="block" color="primary" onClick={handleSubmitUsers}>
+          ユーザー情報を送信
+        </IonButton>
+        <IonButton expand="block" color="success" onClick={handleResendRequests}>
+          保存されたリクエストを送信
+        </IonButton>
 
       </IonContent>
       <IonFooter>
